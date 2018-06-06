@@ -6,13 +6,12 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-
 app.use(bodyParser.json());
 
-var admin = require('firebase-admin');
-var firebase = require('firebase');
+let admin = require('firebase-admin');
+let firebase = require('firebase');
 
-var config = {
+let config = {
   apiKey: "AIzaSyCUVCJ453FqXEcmUxXthq9oSi2Nex7qKC4",
   authDomain: "fir-functions-bc2ab.firebaseapp.com",
   databaseURL: "https://fir-functions-bc2ab.firebaseio.com",
@@ -22,59 +21,67 @@ var config = {
 };
 firebase.initializeApp(config);
 
-var serviceAccount = require("./serviceAccountKey.json");
+let serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://fir-functions-bc2ab.firebaseio.com'
 });
 
-var firestrore = admin.firestore();
+let firestrore = admin.firestore();
+let uniqueId = [];
 
+//get id's from firestore
 firestrore.collection('conversation').get()
-        .then((querySnapshot) => {
+  .then((querySnapshot) => {
 
-            var conversation = [];
-            querySnapshot.forEach((doc) => {conversation.push(doc.data() )});
-
-            var id = "";
-
-            conversation.forEach((eachMessageData, index) => {
-                id += `${eachMessageData.originalDetectIntentRequest.payload.data.sender.id}\n`
-            })
-            
-      console.log(id);
-
-        })
-        .catch((err => {
-            console.log("Error: ", err);
-      }))
+    let conversation = [];
+    querySnapshot.forEach((doc) => {conversation.push(doc.data() )});
+    
+    let id = [];
+    conversation.forEach((eachMessageData, index) => {
+      id.push(`${eachMessageData.originalDetectIntentRequest.payload.data.sender.id}`)
+    })
+  
+    for (let index = 0; index < id.length; index++) {
+      let currentId = id[index];
+      if (!uniqueId.includes(currentId)) uniqueId.push(currentId);
+    }
+    console.log(id, uniqueId);
+  })
+  .catch((err => {
+    console.log("Error: ", err);
+}))
     
 
 app.get('/', (req, res) => {
-  res.send('Hello from Express!')
+  res.sendfile('views/index.html');
 })
 
-app.post('/', (req, res) => {
-    console.log(req.body.message);
-    let mes = req.body.message;
-        
-    var FBMessenger = require('fb-messenger');
-    var messenger = new FBMessenger('EAADWhiHBnQoBACy8w0RN20kNqQd02duaraYZAGYBt4lBIZB3SLiWZAZByxWvmR7SVRY46LtGMnZA2CBMmmsZCqkS9pL3ALvb6e4adGuSueSuMp0U5UZAkOS2Luxo3QU8j2QZBm7YObOgYY4ttxcyFEefPWXDczSAzJl3Frs660FopAZDZD');
-        
-    messenger.sendTextMessage('1654303328018515', mes);
+app.post('/message', (req, res) => {
+  console.log(req.body.message);
+  let mes = req.body.message;
+      
+  let FBMessenger = require('fb-messenger');
+  let messenger = new FBMessenger('EAADWhiHBnQoBACy8w0RN20kNqQd02duaraYZAGYBt4lBIZB3SLiWZAZByxWvmR7SVRY46LtGMnZA2CBMmmsZCqkS9pL3ALvb6e4adGuSueSuMp0U5UZAkOS2Luxo3QU8j2QZBm7YObOgYY4ttxcyFEefPWXDczSAzJl3Frs660FopAZDZD');
+  
+  //sending to every unique id in firestore
+  for (let i = 0; i<uniqueId.length ; i++){       
+    messenger.sendTextMessage(uniqueId[i], mes);
+  }
 
-  })
+  //writing message sent to realtime db in firebase 
+  admin.database().ref('/messages').push({message: mes}).then((snapshot) => {
+    res.redirect(303, snapshot.ref.toString());
+  });
 
-app.get('/test', function(req, res){
-    res.sendfile('test.html');
-});
+})
+
 
 
 app.listen(port, (err) => {
   if (err) {
     return console.log('something bad happened', err)
   }
-
   console.log(`server is listening on ${port}`)
 })
