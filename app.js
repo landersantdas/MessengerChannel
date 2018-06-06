@@ -9,6 +9,48 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json());
 
+var admin = require('firebase-admin');
+var firebase = require('firebase');
+
+var config = {
+  apiKey: "AIzaSyCUVCJ453FqXEcmUxXthq9oSi2Nex7qKC4",
+  authDomain: "fir-functions-bc2ab.firebaseapp.com",
+  databaseURL: "https://fir-functions-bc2ab.firebaseio.com",
+  projectId: "fir-functions-bc2ab",
+  storageBucket: "fir-functions-bc2ab.appspot.com",
+  messagingSenderId: "294274764437"
+};
+firebase.initializeApp(config);
+
+var serviceAccount = require("./serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://fir-functions-bc2ab.firebaseio.com'
+});
+
+var firestrore = admin.firestore();
+
+firestrore.collection('conversation').get()
+        .then((querySnapshot) => {
+
+            var conversation = [];
+            querySnapshot.forEach((doc) => {conversation.push(doc.data() )});
+
+            var id = "";
+
+            conversation.forEach((eachMessageData, index) => {
+                id += `${eachMessageData.originalDetectIntentRequest.payload.data.sender.id}\n`
+            })
+            
+      console.log(id);
+
+        })
+        .catch((err => {
+            console.log("Error: ", err);
+      }))
+    
+
 app.get('/', (req, res) => {
   res.send('Hello from Express!')
 })
