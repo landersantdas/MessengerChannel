@@ -74,16 +74,18 @@ app.post('/send', (req, res) => {
 
     //writing message sent to realtime db in firebase 
     admin.database().ref('/messages').push({message: mes}).then((snapshot) => {
-        res.redirect(303, snapshot.ref.toString());
+        //res.redirect(303, snapshot.ref.toString());
+        res.redirect('/sent');
     });
-
 })
 
-
+app.get('/sent', (req, res) => {
+    res.sendfile('views/sent.html');
+})
 
 app.listen(port, (err) => {
-  if (err) {
-    return console.log('something bad happened', err)
-  }
-  console.log(`server is listening on ${port}`)
+    if (err) {
+        return console.log('something bad happened', err)
+    }
+    console.log(`server is listening on ${port}`)
 })

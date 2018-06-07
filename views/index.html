@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Send</title>
     
     <style>
         .submitButton{
@@ -16,23 +16,22 @@
             background-color: rgb(21, 21, 124);
         }
         textarea{
-            font-size: 14px;
+            font-size: 15px;
             font-family:'Lucida Sans'
         }
-        
     </style>
 
 </head>
 <body>
     
-    <h2>Send message: </h2>
+    <h2 style="font-family:'Arial'">SEND MESSAGE: </h2>
     <form method="post" action="/send">
         <table> 
             <tr>
-                <td><textarea placeholder="Type your message here ..." name="message" cols="52" rows="10"></textarea><br></td>
+                <td><textarea placeholder = "Type your message here ..." name="message" cols="52" rows="9"></textarea><br></td>
             </tr>
             <tr> 
-                <td align="right"><input type="submit" value="Send" class = "submitButton" style="width: 200px; "></td>        
+                <td align="right"><input type="submit" value="Send" class = "submitButton" style="width: 250px; "></td>        
             </tr>
         </table>
     </form>
