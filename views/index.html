@@ -25,13 +25,13 @@
 <body>
     
     <h2 style="font-family:'Arial'">SEND MESSAGE: </h2>
-    <form method="post" action="/send">
+    <form method="post" action="/send" onsubmit="this.submitBtn.disabled = true; return true;"> 
         <table> 
             <tr>
                 <td><textarea placeholder = "Type your message here ..." name="message" cols="52" rows="9"></textarea><br></td>
             </tr>
             <tr> 
-                <td align="right"><input type="submit" value="Send" class = "submitButton" style="width: 250px; "></td>        
+                <td align="right"><input type="submit" value="Send" name="submitBtn" class = "submitButton" style="width: 250px; "></td>        
             </tr>
         </table>
     </form>
